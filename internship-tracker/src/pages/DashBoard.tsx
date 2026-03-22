@@ -1,12 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { Job } from "../types/Job";
 import { JobRow } from "./JobRow";
+import { useAuth } from "../context/useAuth";
 
 const DashBoard = () => {
   const allJobs: Job[] = [];
   const navigate = useNavigate();
+  const user = useAuth();
+  console.log(user.email);
+  console.log(user.token);
 
   allJobs.push({
+    id: 1,
     url: "https://www.linkedin.com/jobs/search-results/?currentJobId=4359236722&keywords=software%20engineer%20intern&origin=SUGGESTION",
     company: "NYSISO",
     addedOn: new Date().toLocaleDateString(),
@@ -15,6 +20,7 @@ const DashBoard = () => {
     title: "Software Engineer Intern",
     location: "Albany",
     dateApplied: "",
+    dateResponded: "",
     jobSummary:
       "Majoring in Engineering, Computer Science, or a related field \n Familiarity with one or more of the following: Python, Java, Javascript, SQL Currently attending college in the U.S.",
     salary: "$25",
@@ -56,11 +62,12 @@ const DashBoard = () => {
               <th>Notes</th>
               <th>Job Summary</th>
               <th>URL</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {allJobs.map((job, index) => (
-              <JobRow key={index} {...job} />
+            {allJobs.map((job) => (
+              <JobRow key={job.id} {...job} />
             ))}
           </tbody>
         </table>
