@@ -4,7 +4,17 @@ import axios from "axios";
 const AddJob = () => {
   const [description, setDescription] = useState<string>("");
 
-  const [formData, setFormData] = useState<Partial<Job>>({});
+  const [formData, setFormData] = useState({
+    title: "",
+    company: "",
+    url: "",
+    location: "",
+    dateApplied: "",
+    status: "NOT_APPLIED",
+    jobSummary: "",
+    notes: "",
+    skills: [] as string[],
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -56,6 +66,32 @@ const AddJob = () => {
       console.log(error);
       alert("error in AI extraction");
     }
+  };
+
+  const handleSkillChange = (index: number, value: string) => {
+    const updatedSkills = [...formData.skills];
+    updatedSkills[index] = value;
+
+    setFormData((prev) => ({
+      ...prev,
+      skills: updatedSkills,
+    }));
+  };
+
+  const addSkill = () => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: [...prev.skills, ""],
+    }));
+  };
+
+  const removeSkill = (index: number) => {
+    const updatedSkills = formData.skills.filter((_, i) => i !== index);
+
+    setFormData((prev) => ({
+      ...prev,
+      skills: updatedSkills,
+    }));
   };
 
   return (
@@ -179,6 +215,34 @@ const AddJob = () => {
             value={formData.notes}
             onChange={handleChange}
           />
+        </div>
+
+        <div className="d-grid mb-3">
+          <label className="form-label">Skills</label>
+
+          {formData.skills.map((skill, index) => (
+            <div key={index} className="d-flex mb-2">
+              <input
+                type="text"
+                className="form-control me-2"
+                value={skill}
+                onChange={(e) => handleSkillChange(index, e.target.value)}
+                placeholder="Enter a skill (e.g. React, Java)"
+              />
+
+              <button
+                type="button"
+                className="btn btn-danger"
+                onClick={() => removeSkill(index)}
+              >
+                -
+              </button>
+            </div>
+          ))}
+
+          <button type="button" className="btn btn-success" onClick={addSkill}>
+            + Add Skill
+          </button>
         </div>
 
         <button type="submit" className="btn btn-primary">
