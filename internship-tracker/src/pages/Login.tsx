@@ -32,7 +32,7 @@ const Login = () => {
 
       const res = await axios.post(
         "http://localhost:8080/api/auth/login",
-        login
+        login,
       );
       console.log(res.data);
     } catch (error) {
@@ -93,9 +93,9 @@ const Login = () => {
           </button>
           <Link
             style={{ alignSelf: "center", marginTop: "30px", fontSize: "20px" }}
-            to={"/login"}
+            to={"/signup"}
           >
-            Already have an account? Login Here!
+            Don't have an account? Sign up Here!
           </Link>
         </div>
       </div>

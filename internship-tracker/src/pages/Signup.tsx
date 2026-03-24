@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -11,32 +12,39 @@ const backgroundStyle: React.CSSProperties = {
 };
 
 const Signup = () => {
+  const context = useContext(AuthContext);
+  const navigate = useNavigate();
+
   interface SignupForm {
-    firstName: string;
-    lastName: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
     password: string;
   }
 
   const handleChange = (update: Partial<SignupForm>) => {
     setSignup((signup) => ({ ...signup, ...update }));
-    setTimeout(() => {
-      console.log(signup);
-    }, 1000);
   };
 
   async function handleSubmit() {
     try {
       if (signup.email.trim() === "" || signup.password.trim() === "") {
-        alert("Please fill out email address and password");
+        alert("Please fill out email and password");
         return;
       }
 
       const res = await axios.post(
         "http://localhost:8080/api/auth/register",
-        signup
+        signup,
       );
-      console.log(res.data);
+
+      const token = res.data;
+      console.log(token);
+      context?.login(signup.email, token);
+      console.log("The email of the current user: ", context?.email);
+      console.log("The token of the current user: ", context?.token);
+      alert("Successfull signup");
+      navigate("/dashboard");
     } catch (error) {
       console.log("error message: ", error);
     }
@@ -91,20 +99,20 @@ const Signup = () => {
                 placeholder="First Name"
                 name="firstName"
                 value={signup.firstName}
-                onChange={(e) => handleChange({ email: e.target.value })}
+                onChange={(e) => handleChange({ firstName: e.target.value })}
                 required
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">First Name</label>
+              <label className="form-label">Last Name</label>
               <input
                 type="text"
                 className="form-control"
                 placeholder="Last Name"
                 name="lastName"
                 value={signup.lastName}
-                onChange={(e) => handleChange({ email: e.target.value })}
+                onChange={(e) => handleChange({ lastName: e.target.value })}
                 required
               />
             </div>
