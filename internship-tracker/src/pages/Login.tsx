@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../context/AuthContext";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -11,6 +12,9 @@ const backgroundStyle: React.CSSProperties = {
 };
 
 const Login = () => {
+  const context = useContext(AuthContext);
+  const navigate = useNavigate();
+
   interface LoginForm {
     email: string;
     password: string;
@@ -18,9 +22,6 @@ const Login = () => {
 
   const handleChange = (update: Partial<LoginForm>) => {
     setLogin((login) => ({ ...login, ...update }));
-    setTimeout(() => {
-      console.log(login);
-    }, 1000);
   };
 
   async function handleSubmit() {
@@ -34,9 +35,12 @@ const Login = () => {
         "http://localhost:8080/api/auth/login",
         login,
       );
-      console.log(res.data);
+      const token = res.data;
+      context?.login(login.email, token);
+      navigate("/dashboard");
     } catch (error) {
       console.log("error message: ", error);
+      alert("Error in signing in. Please try again");
     }
   }
 
@@ -95,7 +99,7 @@ const Login = () => {
             style={{ alignSelf: "center", marginTop: "30px", fontSize: "20px" }}
             to={"/signup"}
           >
-            Don't have an account? Sign up Here!
+            Don't have an account? Register Here!
           </Link>
         </div>
       </div>

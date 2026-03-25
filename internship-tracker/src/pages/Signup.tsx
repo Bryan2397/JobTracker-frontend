@@ -39,14 +39,12 @@ const Signup = () => {
       );
 
       const token = res.data;
-      console.log(token);
       context?.login(signup.email, token);
-      console.log("The email of the current user: ", context?.email);
-      console.log("The token of the current user: ", context?.token);
       alert("Successfull signup");
       navigate("/dashboard");
     } catch (error) {
       console.log("error message: ", error);
+      alert("Error in signing in. Please try again");
     }
   }
 
