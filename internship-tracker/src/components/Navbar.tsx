@@ -1,9 +1,21 @@
+import { useAuth } from "../context/useAuth";
+import { useNavigate } from "react-router-dom";
+
 const Navbar = () => {
+  const user = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    user.logout();
+    navigate("/login");
+    alert("You have signed out");
+  }
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container">
-          <a className="navbar-brand" href="#">
+          <a className="navbar-brand" href="/">
             JobTracker
           </a>
           <button
@@ -30,26 +42,11 @@ const Navbar = () => {
                 <a className="nav-link" href="#">
                   Login
                 </a>
-                <ul
-                  className="dropdown-menu"
-                  aria-labelledby="navbarDropdownMenuLink"
-                >
-                  <li>
-                    <a className="dropdown-item" href="#">
-                      Action
-                    </a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item" href="#">
-                      Another action
-                    </a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item" href="#">
-                      Something else here
-                    </a>
-                  </li>
-                </ul>
+              </li>
+              <li className="nav-item">
+                <a className="nav-link" onClick={() => handleLogout}>
+                  Logout
+                </a>
               </li>
             </ul>
           </div>
