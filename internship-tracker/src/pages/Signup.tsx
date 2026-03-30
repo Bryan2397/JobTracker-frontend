@@ -1,7 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -13,6 +14,7 @@ const backgroundStyle: React.CSSProperties = {
 
 const Signup = () => {
   const context = useContext(AuthContext);
+  const user = useAuth();
   const navigate = useNavigate();
 
   interface SignupForm {
@@ -39,9 +41,10 @@ const Signup = () => {
       );
 
       const token = res.data;
+      localStorage.setItem("token", token);
       context?.login(signup.email, token);
-      alert("Successfull signup");
       navigate("/dashboard");
+      alert("Successfull signup");
     } catch (error) {
       console.log("error message: ", error);
       alert("Error in signing in. Please try again");

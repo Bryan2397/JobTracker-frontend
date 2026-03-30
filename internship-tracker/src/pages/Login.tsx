@@ -1,7 +1,7 @@
-import { useContext, useState } from "react";
-import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
+import api from "../utils/api";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -31,13 +31,12 @@ const Login = () => {
         return;
       }
 
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/login",
-        login,
-      );
+      const res = await api.post("/api/auth/login", login);
       const token = res.data;
+      localStorage.setItem("token", token);
       context?.login(login.email, token);
       navigate("/dashboard");
+      alert("Successfull login");
     } catch (error) {
       console.log("error message: ", error);
       alert("Error in signing in. Please try again");
@@ -93,7 +92,7 @@ const Login = () => {
               fontSize: "20px",
             }}
           >
-            Register
+            Login
           </button>
           <Link
             style={{ alignSelf: "center", marginTop: "30px", fontSize: "20px" }}
