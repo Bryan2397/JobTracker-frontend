@@ -16,8 +16,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = (email: string, token: string) => {
+    setEmail(email);
+    setToken(token);
     localStorage.setItem("email", email);
     localStorage.setItem("token", token);
+  };
+
+  const getToken = (): string | null => {
+    return localStorage.getItem("token");
   };
 
   const logout = () => {
@@ -28,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ email, token, login, logout }}>
+    <AuthContext.Provider value={{ email, token, getToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

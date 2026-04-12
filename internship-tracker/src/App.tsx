@@ -5,6 +5,7 @@ import DashBoard from "./pages/DashBoard";
 import AddJob from "./pages/AddJob";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
+import EditJob from "./pages/EditJob";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -15,11 +16,12 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/dashboard"
-          element={token != null ? <DashBoard /> : <Login />}
-        />
+        <Route path="/dashboard" element={<DashBoard />} />
         <Route path="/add" element={token != null ? <AddJob /> : <Login />} />
+        <Route
+          path="/edit/:id"
+          element={token != null ? <EditJob /> : <Login />}
+        />
       </Routes>
     </>
   );
