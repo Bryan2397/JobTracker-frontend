@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Job } from "../types/Job";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 export const JobRow = (job: Job) => {
   const navigate = useNavigate();
@@ -26,8 +27,8 @@ export const JobRow = (job: Job) => {
   };
 
   function deleteJob(id: number) {
-    console.log("can delete");
-    console.log(id);
+    api.delete(`/api/job/delete/${id}`);
+    navigate(0);
   }
 
   return (
@@ -49,7 +50,7 @@ export const JobRow = (job: Job) => {
         </td>
         <td>{job.salary}</td>
         <td>{job.dateApplied}</td>
-        <td>{job.addedOn}</td>
+        <td>{job.dateAdded}</td>
 
         <td
           style={{
@@ -64,7 +65,7 @@ export const JobRow = (job: Job) => {
           >
             {show ? "Hide" : "Show"}
           </button>
-          {show && job.notes}
+          {show && job.jobSummary}
         </td>
         <td
           style={{
@@ -82,7 +83,7 @@ export const JobRow = (job: Job) => {
           {open && job.jobSummary}
         </td>
         <td>
-          <a href={job.url}>LINK</a>
+          <a href={job.jobUrl}>LINK</a>
         </td>
         <td>
           <button

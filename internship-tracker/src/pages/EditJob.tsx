@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
-import { jobData, User } from "../types/Job";
+import { useParams, useNavigate } from "react-router-dom";
+import { Job } from "../types/Job";
 import { useAuth } from "../context/useAuth";
 import api from "../utils/api";
-import { useNavigate } from "react-router-dom";
 
-const AddJob = () => {
-  const [description, setDescription] = useState<string>("");
-  const [aiCounter, setAiCounter] = useState<number>(0);
-  const user = useAuth();
+const EditJob = () => {
+  const { id } = useParams(); // 👈 get job id from URL
   const navigate = useNavigate();
+  const user = useAuth();
+
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     title: "",
     company: "",
     salary: "",
-    jobUrl: "",
+    url: "",
     location: "",
     dateApplied: "",
     status: "NOT_APPLIED",
@@ -23,31 +24,38 @@ const AddJob = () => {
     skills: [] as string[],
   });
 
+  // ✅ Fetch job on mount
   useEffect(() => {
-    async function getUserInfo() {
-      api.post("/api/user/aiTimer");
-      try {
-        const res = await api.get<User>("/api/user/me");
-        console.log(res.data);
-        setAiCounter(res.data.aiUsage);
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          if (error.message.includes("403")) {
-            user.logout();
-          } else if (error.message.includes("401")) {
-            alert("Unauthorized");
-            user.logout();
-          } else if (error.message.includes("500")) {
-            alert("Server error");
-          } else {
-            alert("Connection error");
-          }
-        }
-      }
-    }
-    getUserInfo();
-  }, []);
+    const fetchJob = async () => {
+      if (!user.getToken()) return;
 
+      try {
+        const res = await api.get(`/api/job/${id}`);
+        const job: Job = res.data;
+        console.log(res.data);
+        setFormData({
+          title: job.title || "",
+          company: job.company || "",
+          salary: job.salary || "",
+          url: job.jobUrl || "",
+          location: job.location || "",
+          dateApplied: job.dateApplied || "",
+          status: job.status || "NOT_APPLIED",
+          jobSummary: job.jobSummary || "",
+          notes: job.notes || "",
+          skills: job.skills || [],
+        });
+
+        setLoading(false);
+      } catch (error) {
+        console.log("Error fetching job:", error);
+      }
+    };
+
+    fetchJob();
+  }, [id, user]);
+
+  // ✅ Handle form change
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -61,63 +69,28 @@ const AddJob = () => {
     }));
   };
 
+  // ✅ Submit update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (user.getToken() === null) {
-      alert("Please Sign in to save jobs");
+
+    if (!user.getToken()) {
+      user.logout();
+      alert("Please sign in");
       return;
     }
 
     try {
-      const res = await api.post("/api/job/save", formData);
-      console.log(res.data);
-      if (res.data === "Successful") {
-        alert("Successful");
-        navigate("/dashboard");
-      } else {
-        alert("Error saving job information");
-      }
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        if (error.message.includes("403")) {
-          alert("");
-        }
-      }
-    }
-  };
+      const res = await api.put(`/api/job/${id}`, formData);
+      console.log("Updated:", res.data);
 
-  const handleChatResponse = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setDescription(description.trim());
-
-    if (user.token === null) {
-      alert("Please Sign in to use AI enhancement");
-      return;
-    }
-
-    try {
-      const result = await api.post<jobData>("/api/chat/description", {
-        params: {
-          description,
-        },
-      });
-      console.log(result.data);
-      console.log(typeof result);
-      const aiData = result.data;
-      setFormData((prev) => ({
-        ...prev,
-        ...aiData,
-        status: "NOT_APPLIED",
-        location: aiData.location,
-        addedOn: new Date().toISOString(),
-      }));
-      setAiCounter(aiCounter - 1);
+      // optional redirect after update
+      navigate("/dashboard");
     } catch (error) {
-      console.log(error);
-      alert("error in AI extraction");
+      console.log("Error updating job:", error);
     }
   };
 
+  // ✅ Skills handlers (same as yours)
   const handleSkillChange = (index: number, value: string) => {
     const updatedSkills = [...formData.skills];
     updatedSkills[index] = value;
@@ -144,38 +117,11 @@ const AddJob = () => {
     }));
   };
 
+  if (loading) return <p>Loading...</p>;
+
   return (
     <div className="container mt-4">
-      <h2 style={{ marginBottom: "40px" }}>Add Job</h2>
-
-      <div className="mb-5">
-        <div className="d-flex justify-content-between">
-          <label className="d-inline" style={{ fontSize: "30px" }}>
-            <strong>Use AI to Save time!!</strong>
-          </label>
-          <label className="d-inline" style={{ fontSize: "30px" }}>
-            <strong> Tries left: {aiCounter}</strong>
-          </label>
-        </div>
-        <textarea
-          className="mb-2 mt-3 form-control form-control-lg"
-          rows={10}
-          placeholder="Place the entire Job description here"
-          value={description}
-          onChange={(event: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setDescription(event.target.value)
-          }
-        >
-          {description}
-        </textarea>
-        <button
-          onClick={handleChatResponse}
-          className="d-block btn btn-primary"
-          disabled={aiCounter === 0}
-        >
-          Send to AI
-        </button>
-      </div>
+      <h2 style={{ marginBottom: "40px" }}>Edit Job</h2>
 
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
@@ -203,12 +149,10 @@ const AddJob = () => {
         <div className="mb-3">
           <label className="form-label">Job URL</label>
           <input
-            name="jobUrl"
-            type="url"
+            name="url"
             className="form-control"
-            value={formData.jobUrl}
+            value={formData.url}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -219,7 +163,6 @@ const AddJob = () => {
             className="form-control"
             value={formData.salary}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -266,10 +209,8 @@ const AddJob = () => {
           <textarea
             name="jobSummary"
             className="form-control"
-            rows={3}
             value={formData.jobSummary}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -278,25 +219,21 @@ const AddJob = () => {
           <textarea
             name="notes"
             className="form-control"
-            rows={3}
             value={formData.notes}
             onChange={handleChange}
           />
         </div>
 
-        <div className="d-grid mb-3">
-          <label className="form-label">Skills</label>
+        <div className="mb-3">
+          <label className="form-label d-flex">Skills</label>
 
           {formData.skills.map((skill, index) => (
             <div key={index} className="d-flex mb-2">
               <input
-                type="text"
                 className="form-control me-2"
                 value={skill}
                 onChange={(e) => handleSkillChange(index, e.target.value)}
-                placeholder="Enter a skill (e.g. React, Java, AWS)"
               />
-
               <button
                 type="button"
                 className="btn btn-danger"
@@ -312,16 +249,12 @@ const AddJob = () => {
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary"
-          onClick={handleSubmit}
-        >
-          Add Job
+        <button type="submit" className="btn btn-primary">
+          Update Job
         </button>
       </form>
     </div>
   );
 };
 
-export default AddJob;
+export default EditJob;

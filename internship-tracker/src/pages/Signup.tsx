@@ -1,8 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
-import { useAuth } from "../context/useAuth";
+import api from "../utils/api";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -14,7 +13,6 @@ const backgroundStyle: React.CSSProperties = {
 
 const Signup = () => {
   const context = useContext(AuthContext);
-  const user = useAuth();
   const navigate = useNavigate();
 
   interface SignupForm {
@@ -35,13 +33,10 @@ const Signup = () => {
         return;
       }
 
-      const res = await axios.post(
-        "http://localhost:8080/api/auth/register",
-        signup,
-      );
+      const res = await api.post("/api/auth/register", signup);
 
       const token = res.data;
-      localStorage.setItem("token", token);
+      //localStorage.setItem("token", token);
       context?.login(signup.email, token);
       navigate("/dashboard");
       alert("Successfull signup");

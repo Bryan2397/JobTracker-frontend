@@ -6,9 +6,10 @@ import AddJob from "./pages/AddJob";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import EditJob from "./pages/EditJob";
+import { useAuth } from "./context/useAuth";
 
 function App() {
-  const token = localStorage.getItem("token");
+  const token = useAuth().getToken();
   return (
     <>
       <Navbar />

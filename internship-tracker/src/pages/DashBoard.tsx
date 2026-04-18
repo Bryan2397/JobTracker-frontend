@@ -1,31 +1,70 @@
 import { useNavigate } from "react-router-dom";
 import { Job } from "../types/Job";
-import { JobRow } from "./JobRow";
+import { JobRow } from "../components/JobRow";
 import { useAuth } from "../context/useAuth";
+import { useEffect, useState } from "react";
+import api from "../utils/api";
 
 const DashBoard = () => {
-  const allJobs: Job[] = [];
+  const [myJobs, setMyJobs] = useState<Job[]>([]);
   const navigate = useNavigate();
   const user = useAuth();
-  console.log(user.email);
-  console.log(user.token);
+  const [responseRate, setResponseRate] = useState<number>(0);
+  const [rejectionRate, setRejectionRate] = useState<number>(0);
+  const [interviewRate, setInterviewRate] = useState<number>(0);
 
-  allJobs.push({
-    id: 1,
-    url: "https://www.linkedin.com/jobs/search-results/?currentJobId=4359236722&keywords=software%20engineer%20intern&origin=SUGGESTION",
-    company: "NYSISO",
-    addedOn: new Date().toLocaleDateString(),
-    status: "NOT_APPLIED",
-    notes: "Apply soon",
-    title: "Software Engineer Intern",
-    location: "Albany",
-    dateApplied: "",
-    dateResponded: "",
-    jobSummary:
-      "Majoring in Engineering, Computer Science, or a related field \n Familiarity with one or more of the following: Python, Java, Javascript, SQL Currently attending college in the U.S.",
-    salary: "$25",
-    skills: ["Java", "TypeScript"],
-  });
+  useEffect(() => {
+    async function gettingJobs() {
+      try {
+        const res = await api.get("/api/job/myJobs");
+
+        if (res.data instanceof Array) {
+          setMyJobs(res.data);
+        }
+        console.log(res.data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          if (error.message.includes("403")) {
+            user.logout();
+          } else if (error.message.includes("401")) {
+            alert("Unauthorized");
+            user.logout();
+          } else if (error.message.includes("500")) {
+            alert("Server error");
+          } else {
+            alert("Connection error");
+          }
+        }
+      }
+    }
+
+    gettingJobs();
+  }, []);
+
+  useEffect(() => {
+    function getRates(): void {
+      let response: number = 0;
+      let rejection: number = 0;
+      let interview: number = 0;
+      for (let i = 0; i < myJobs.length; i++) {
+        if (myJobs[i].status === "INTERVIEW") {
+          interview++;
+        } else if (myJobs[i].status === "REJECTED") {
+          rejection++;
+        } else if (
+          myJobs[i].status !== "APPLIED" &&
+          myJobs[i].status !== "NOT_APPLIED"
+        ) {
+          response++;
+        }
+        setResponseRate(Math.ceil(response / myJobs.length));
+        setRejectionRate(Math.ceil(rejection / myJobs.length));
+        setInterviewRate(Math.ceil(interview / myJobs.length));
+      }
+    }
+
+    getRates();
+  }, [myJobs]);
 
   return (
     <div className="container">
@@ -44,6 +83,30 @@ const DashBoard = () => {
         >
           Add new Job
         </button>
+      </div>
+      <div className="container my-4">
+        <div className="row text-center g-3">
+          <div className="col-md-4">
+            <div className="p-3 border rounded shadow-sm">
+              <h6 className="text-muted">Response Rate</h6>
+              <h2 className="fw-bold text-primary">{responseRate}%</h2>
+            </div>
+          </div>
+
+          <div className="col-md-4">
+            <div className="p-3 border rounded shadow-sm">
+              <h6 className="text-muted">Rejection Rate</h6>
+              <h2 className="fw-bold text-danger">{rejectionRate}%</h2>
+            </div>
+          </div>
+
+          <div className="col-md-4">
+            <div className="p-3 border rounded shadow-sm">
+              <h6 className="text-muted">Interview Rate</h6>
+              <h2 className="fw-bold text-success">{interviewRate}%</h2>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="container mt-5" style={{ overflow: "auto" }}>
         <h2 className="mb-4">Job applications</h2>
@@ -66,7 +129,7 @@ const DashBoard = () => {
             </tr>
           </thead>
           <tbody>
-            {allJobs.map((job) => (
+            {myJobs.map((job) => (
               <JobRow key={job.id} {...job} />
             ))}
           </tbody>
