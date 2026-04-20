@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import api from "../utils/api";
@@ -37,7 +37,7 @@ const Login = () => {
       context?.login(login.email, token);
       navigate("/dashboard");
       alert("Successfull login");
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("error message: ", error);
       alert("Error in signing in. Please try again");
     }
