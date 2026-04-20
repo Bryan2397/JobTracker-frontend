@@ -36,11 +36,10 @@ const Signup = () => {
       const res = await api.post("/api/auth/register", signup);
 
       const token = res.data;
-      //localStorage.setItem("token", token);
       context?.login(signup.email, token);
       navigate("/dashboard");
       alert("Successfull signup");
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("error message: ", error);
       alert("Error in signing in. Please try again");
     }

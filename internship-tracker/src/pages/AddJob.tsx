@@ -28,7 +28,6 @@ const AddJob = () => {
       api.post("/api/user/aiTimer");
       try {
         const res = await api.get<User>("/api/user/me");
-        console.log(res.data);
         setAiCounter(res.data.aiUsage);
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -70,7 +69,6 @@ const AddJob = () => {
 
     try {
       const res = await api.post("/api/job/save", formData);
-      console.log(res.data);
       if (res.data === "Successful") {
         alert("Successful");
         navigate("/dashboard");
@@ -101,8 +99,6 @@ const AddJob = () => {
           description,
         },
       });
-      console.log(result.data);
-      console.log(typeof result);
       const aiData = result.data;
       setFormData((prev) => ({
         ...prev,
@@ -112,7 +108,7 @@ const AddJob = () => {
         addedOn: new Date().toISOString(),
       }));
       setAiCounter(aiCounter - 1);
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(error);
       alert("error in AI extraction");
     }

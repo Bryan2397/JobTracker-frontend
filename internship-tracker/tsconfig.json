@@ -1,12 +1,19 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
     "jsx": "react-jsx",
-    "noImplicitAny": true,
-    "baseUrl": "src",
-    "paths": {
-      "@components/*": ["components/*"],
-      "@types/*": ["types/*"]
-    }
-  }
+    "esModuleInterop": true
+  },
+  "include": ["src"]
 }

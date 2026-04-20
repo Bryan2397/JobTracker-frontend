@@ -5,7 +5,7 @@ import { useAuth } from "../context/useAuth";
 import api from "../utils/api";
 
 const EditJob = () => {
-  const { id } = useParams(); // 👈 get job id from URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const user = useAuth();
 
@@ -24,7 +24,6 @@ const EditJob = () => {
     skills: [] as string[],
   });
 
-  // ✅ Fetch job on mount
   useEffect(() => {
     const fetchJob = async () => {
       if (!user.getToken()) return;
@@ -47,7 +46,7 @@ const EditJob = () => {
         });
 
         setLoading(false);
-      } catch (error) {
+      } catch (error: unknown) {
         console.log("Error fetching job:", error);
       }
     };
@@ -55,7 +54,6 @@ const EditJob = () => {
     fetchJob();
   }, [id, user]);
 
-  // ✅ Handle form change
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -69,7 +67,6 @@ const EditJob = () => {
     }));
   };
 
-  // ✅ Submit update
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -80,17 +77,13 @@ const EditJob = () => {
     }
 
     try {
-      const res = await api.put(`/api/job/${id}`, formData);
-      console.log("Updated:", res.data);
-
-      // optional redirect after update
+      await api.put(`/api/job/${id}`, formData);
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: unknown) {
       console.log("Error updating job:", error);
     }
   };
 
-  // ✅ Skills handlers (same as yours)
   const handleSkillChange = (index: number, value: string) => {
     const updatedSkills = [...formData.skills];
     updatedSkills[index] = value;
