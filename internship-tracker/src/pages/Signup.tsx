@@ -32,10 +32,10 @@ const Signup = () => {
         alert("Please fill out email and password");
         return;
       }
-      console.log("API URL:", import.meta.env.VITE_API_URL);
       const res = await api.post("/api/auth/register", signup);
 
       const token = res.data;
+      console.log(token);
       context?.login(signup.email, token);
       navigate("/dashboard");
       alert("Successfull signup");
