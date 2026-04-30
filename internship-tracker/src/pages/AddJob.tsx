@@ -3,6 +3,7 @@ import { jobData, User } from "../types/Job";
 import { useAuth } from "../context/useAuth";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddJob = () => {
   const [description, setDescription] = useState<string>("");
@@ -32,14 +33,15 @@ const AddJob = () => {
       } catch (error: unknown) {
         if (error instanceof Error) {
           if (error.message.includes("403")) {
+            toast.error("User Session Expired");
             user.logout();
           } else if (error.message.includes("401")) {
-            alert("Unauthorized");
+            toast.error("Unauthorized");
             user.logout();
           } else if (error.message.includes("500")) {
-            alert("Server error");
+            toast.error("Server error occured");
           } else {
-            alert("Connection error");
+            toast.error("Connection error");
           }
         }
       }
@@ -63,22 +65,30 @@ const AddJob = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (user.getToken() === null) {
-      alert("Please Sign in to save jobs");
+      toast.error("Please Sign in to save jobs");
       return;
     }
 
     try {
       const res = await api.post("/api/job/save", formData);
       if (res.data === "Successful") {
-        alert("Successful");
+        toast.success("Successful");
         navigate("/dashboard");
       } else {
-        alert("Error saving job information");
+        toast.error("Error saving job information");
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.message.includes("403")) {
-          alert("");
+          toast.error("User Session Expired");
+          user.logout();
+        } else if (error.message.includes("401")) {
+          toast.error("Unauthorized");
+          user.logout();
+        } else if (error.message.includes("500")) {
+          toast.error("Server error occured");
+        } else {
+          toast.error("Connection error");
         }
       }
     }

@@ -7,11 +7,13 @@ import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import EditJob from "./pages/EditJob";
 import { useAuth } from "./context/useAuth";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const token = useAuth().getToken();
   return (
     <>
+      <ToastContainer />
       <Navbar />
       <Routes>
         <Route path="/" element={<HomePage />} />

@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import api from "../utils/api";
+import { toast } from "react-toastify";
 
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
@@ -31,15 +32,25 @@ const Login = () => {
         return;
       }
 
-      const res = await api.post("/api/auth/login", login);
+      const request = api.post("/api/auth/login", login);
+      const res = await toast.promise(
+        request,
+        {
+          pending: "Logging in...",
+          success: "Login Successful",
+          error: "Login failed, please try again",
+        },
+        {
+          position: "top-center",
+        },
+      );
       const token = res.data;
-      localStorage.setItem("token", token);
+      await localStorage.setItem("token", token);
       context?.login(login.email, token);
       navigate("/dashboard");
-      alert("Successfull login");
     } catch (error: unknown) {
       console.log("error message: ", error);
-      alert("Error in signing in. Please try again");
+      toast.error("Error in signing in. Please try again");
     }
   }
 

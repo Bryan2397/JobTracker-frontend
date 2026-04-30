@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import api from "../utils/api";
-
+import { toast } from "react-toastify";
 const backgroundStyle: React.CSSProperties = {
   minHeight: "100vh",
   background: "linear-gradient(135deg, #0d6efd, #6ea8fe)",
@@ -29,19 +29,28 @@ const Signup = () => {
   async function handleSubmit() {
     try {
       if (signup.email.trim() === "" || signup.password.trim() === "") {
-        alert("Please fill out email and password");
+        toast.warn("Please fill out email and password");
         return;
       }
-      const res = await api.post("/api/auth/register", signup);
 
+      const request = api.post("/api/auth/register", signup);
+      const res = await toast.promise(
+        request,
+        {
+          pending: "Saving account information",
+          success: "Account Successful",
+          error: "Signup failed, please try again",
+        },
+        {
+          position: "top-center",
+        },
+      );
       const token = res.data;
-      console.log(token);
-      context?.login(signup.email, token);
+      await context?.login(signup.email, token);
       navigate("/dashboard");
-      alert("Successfull signup");
     } catch (error: unknown) {
       console.log("error message: ", error);
-      alert("Error in signing in. Please try again");
+      toast.error("Error in signing in. Please try again");
     }
   }
 

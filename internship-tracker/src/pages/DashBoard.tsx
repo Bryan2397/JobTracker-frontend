@@ -3,6 +3,7 @@ import { Job } from "../types/Job";
 import { JobRow } from "../components/JobRow";
 import { useAuth } from "../context/useAuth";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import api from "../utils/api";
 
 const DashBoard = () => {
@@ -17,29 +18,30 @@ const DashBoard = () => {
     async function gettingJobs() {
       try {
         const res = await api.get("/api/job/myJobs");
-
         if (res.data instanceof Array) {
           setMyJobs(res.data);
         }
-        console.log(res.data);
       } catch (error: unknown) {
         if (error instanceof Error) {
           if (error.message.includes("403")) {
             user.logout();
           } else if (error.message.includes("401")) {
-            alert("Unauthorized");
+            toast.error("Unauthorized");
             user.logout();
           } else if (error.message.includes("500")) {
-            alert("Server error");
+            toast.error("Server error");
           } else {
-            alert("Connection error");
+            toast.error("Connection error");
           }
         }
       }
     }
-
-    gettingJobs();
-  }, []);
+    if (!user.token) {
+      return;
+    } else {
+      gettingJobs();
+    }
+  }, [user]);
 
   useEffect(() => {
     function getRates(): void {
