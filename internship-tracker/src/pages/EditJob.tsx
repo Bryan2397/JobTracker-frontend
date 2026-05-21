@@ -143,7 +143,7 @@ const EditJob = () => {
           <input
             name="url"
             className="form-control"
-            value={formData.JobUrl}
+            value={formData.jobUrl}
             onChange={handleChange}
           />
         </div>
