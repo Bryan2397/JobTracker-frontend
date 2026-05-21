@@ -25,10 +25,11 @@ export const JobRow = (job: Job) => {
     }
     return "";
   };
-
-  function deleteJob(id: number) {
-    api.delete(`/api/job/delete/${id}`);
-    navigate(0);
+  async function deleteJob(id: number) {
+    console.log("hey");
+    const res = await api.delete(`/api/job/delete/${id}`);
+    console.log(res);
+    //navigate(0);
   }
 
   return (
@@ -49,8 +50,20 @@ export const JobRow = (job: Job) => {
           </button>
         </td>
         <td>{job.salary}</td>
-        <td>{job.dateApplied}</td>
-        <td>{job.dateAdded}</td>
+        <td>
+          {new Date(job.dateApplied).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </td>
+        <td>
+          {new Date(job.dateAdded).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </td>
 
         <td
           style={{
@@ -65,7 +78,7 @@ export const JobRow = (job: Job) => {
           >
             {show ? "Hide" : "Show"}
           </button>
-          {show && job.jobSummary}
+          {show && <div className="mt-2">{job.note}</div>}
         </td>
         <td
           style={{
@@ -80,7 +93,8 @@ export const JobRow = (job: Job) => {
           >
             {open ? "Hide" : "Open"}
           </button>
-          {open && job.jobSummary}
+
+          {open && <div className="mt-2">{job.jobSummary}</div>}
         </td>
         <td>
           <a href={job.jobUrl}>LINK</a>

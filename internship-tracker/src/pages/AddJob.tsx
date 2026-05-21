@@ -99,11 +99,12 @@ const AddJob = () => {
     setDescription(description.trim());
 
     if (user.token === null) {
-      alert("Please Sign in to use AI enhancement");
+      toast.error("Please Sign in to use AI enhancement");
       return;
     }
 
     try {
+      setAiCounter((prev) => prev - 1);
       const result = await api.post<jobData>("/api/chat/description", {
         params: {
           description,
@@ -117,10 +118,9 @@ const AddJob = () => {
         location: aiData.location,
         addedOn: new Date().toISOString(),
       }));
-      setAiCounter(aiCounter - 1);
     } catch (error: unknown) {
-      console.log(error);
-      alert("error in AI extraction");
+      console.log("Error when sending description to server");
+      toast.error("error in AI extraction");
     }
   };
 

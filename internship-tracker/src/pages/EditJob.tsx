@@ -15,12 +15,12 @@ const EditJob = () => {
     title: "",
     company: "",
     salary: "",
-    url: "",
+    jobUrl: "",
     location: "",
     dateApplied: "",
     status: "NOT_APPLIED",
     jobSummary: "",
-    notes: "",
+    note: "",
     skills: [] as string[],
   });
 
@@ -31,17 +31,16 @@ const EditJob = () => {
       try {
         const res = await api.get(`/api/job/${id}`);
         const job: Job = res.data;
-        console.log(res.data);
         setFormData({
           title: job.title || "",
           company: job.company || "",
           salary: job.salary || "",
-          url: job.jobUrl || "",
+          jobUrl: job.jobUrl || "",
           location: job.location || "",
           dateApplied: job.dateApplied || "",
           status: job.status || "NOT_APPLIED",
           jobSummary: job.jobSummary || "",
-          notes: job.notes || "",
+          note: job.note || "",
           skills: job.skills || [],
         });
 
@@ -144,7 +143,7 @@ const EditJob = () => {
           <input
             name="url"
             className="form-control"
-            value={formData.url}
+            value={formData.JobUrl}
             onChange={handleChange}
           />
         </div>
@@ -210,9 +209,9 @@ const EditJob = () => {
         <div className="mb-3">
           <label className="form-label">Notes</label>
           <textarea
-            name="notes"
+            name="note"
             className="form-control"
-            value={formData.notes}
+            value={formData.note}
             onChange={handleChange}
           />
         </div>
